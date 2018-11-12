@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>mandelbrot</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="854" height="480">This app requires a browser that supports HTML5 and JavaScript.</canvas>
+    <script>
+      
+      var canvas = document.getElementById('canvas');
+      var c = canvas.getContext('2d');
+      var X = canvas.width;
+      var Y = canvas.height;
+      
+      var j=0;
+      var iteration = 1;
+      
+      var length;
+      
+      c.fillStyle = "#000000";
+      c.fillRect(0, 0, X, Y);
+      
+      var x = [];
+      var y = [];
+      
+      var update = [];
+      
+      for (var i = 0; i <= X; i++){
+        x[i] = [];
+        y[i] = [];
+        update[i] = [];
+        for(var j = 0; j <= Y; j++){
+          x[i][j] = (i - X/2 - 100)/(Y/3);
+          y[i][j] = (j - Y/2)/(Y/3);
+          update[i][j] = 1;
+        }
+      }
+      
+      
+      setInterval(function(){ //replace: should reiterate as soon last frame is finished
+        for (var i = 0; i <= X; i++){
+          for(var j = 0; j <= Y; j++){
+            if(update[i][j] !== 0){
+            
+              x2 = x[i][j];
+              y2 = y[i][j];
+              
+              x[i][j] = x2*x2 - y2*y2;
+              y[i][j] = 2*x2*y2;
+              
+              x[i][j] += (i - X/2 - 100)/(Y/3);
+              y[i][j] += (j - Y/2)/(Y/3);
+              
+              length = x[i][j]**2 + y[i][j]**2;
+              
+              
+              
+              if(length <= 4){
+                if(update[i][j] !== 1){
+                  update[i][j] += 1;
+                }
+              }else if(update[i][j] === 1){
+                update[i][j] += 1;
+              }else{
+                update[i][j] = 0;
+              }
+              
+              if(update[i][j] > 1){
+                c.fillStyle = "hsl(" + (iteration + 250) + ", 100%, 50%)";
+                c.fillRect(i, j, 1, 1);
+              }
+            }
+          }
+        }
+        
+        iteration += 1;
+      }, 100);
+      
+    </script>
+  </body>
+</html>

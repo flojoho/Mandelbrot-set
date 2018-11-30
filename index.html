@@ -7,51 +7,46 @@
     <canvas id="canvas" width="854" height="480">This app requires a browser that supports HTML5 and JavaScript.</canvas>
     <script>
       
-      var canvas = document.getElementById('canvas');
-      var c = canvas.getContext('2d');
-      var X = canvas.width;
-      var Y = canvas.height;
+      const canvas = document.getElementById('canvas');
+      const c = canvas.getContext('2d');
       
-      var j=0;
-      var iteration = 1;
+      let iteration = 1;
       
-      var length;
+      const x = [];
+      const y = [];
+      
+      const update = [];
       
       c.fillStyle = "#000000";
-      c.fillRect(0, 0, X, Y);
+      c.fillRect(0, 0, canvas.width, canvas.height);
       
-      var x = [];
-      var y = [];
-      
-      var update = [];
-      
-      for (var i = 0; i <= X; i++){
+      for (let i = 0; i <= canvas.width; i++){
         x[i] = [];
         y[i] = [];
         update[i] = [];
-        for(var j = 0; j <= Y; j++){
-          x[i][j] = (i - X/2 - 100)/(Y/3);
-          y[i][j] = (j - Y/2)/(Y/3);
+        for(let j = 0; j <= canvas.height; j++){
+          x[i][j] = (i - canvas.width / 2 - 100) / (canvas.height / 3);
+          y[i][j] = (j - canvas.height / 2) / (canvas.height / 3);
           update[i][j] = 1;
         }
       }
       
       
       setInterval(function(){
-        for (var i = 0; i <= X; i++){
-          for(var j = 0; j <= Y; j++){
+        for (let i = 0; i <= canvas.width; i++){
+          for(let j = 0; j <= canvas.height; j++){
             if(update[i][j] !== 0){
             
               x2 = x[i][j];
               y2 = y[i][j];
               
-              x[i][j] = x2*x2 - y2*y2;
-              y[i][j] = 2*x2*y2;
+              x[i][j] = x2 ** 2 - y2 ** 2;
+              y[i][j] = 2 * x2 * y2;
               
-              x[i][j] += (i - X/2 - 100)/(Y/3);
-              y[i][j] += (j - Y/2)/(Y/3);
+              x[i][j] += (i - canvas.width / 2 - 100) / (canvas.height / 3);
+              y[i][j] += (j - canvas.height / 2) / (canvas.height / 3);
               
-              length = x[i][j]**2 + y[i][j]**2;
+              const length = x[i][j] ** 2 + y[i][j] ** 2;
               
               
               

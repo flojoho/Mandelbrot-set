@@ -3,68 +3,42 @@ const c = canvas.getContext('2d');
 
 let iteration = 1;
 
-const x = [];
-const y = [];
-
-const pixels = [];
-
-const update = [];
+let pixels = [];
 
 c.fillStyle = "#000000";
 c.fillRect(0, 0, canvas.width, canvas.height);
 
-for (let i = 0; i <= canvas.width; i++) {
-  x[i] = [];
-  y[i] = [];
-  update[i] = [];
-  for(let j = 0; j <= canvas.height; j++) {
-    const coordinates = scaleAndShift({x: i, y: j});
-    x[i][j] = coordinates.x;
-    y[i][j] = coordinates.y;
-    update[i][j] = 1;
+for (let canvasX = 0; canvasX <= canvas.width; canvasX++) {
+  for(let canvasY = 0; canvasY <= canvas.height; canvasY++) {
+    const coordinates = scaleAndShift({ x: canvasX, y: canvasY });
 
     pixels.push({
       x: coordinates.x,
       y: coordinates.y,
-      canvasX: i,
-      canvasY: j
+      canvasX,
+      canvasY
     })
   }
 }
 
 setInterval(function() {
-  for (let i = 0; i <= canvas.width; i++) {
-    for(let j = 0; j <= canvas.height; j++) {
-      if(update[i][j] !== 0) {
+  for(const pixel of pixels) {
+    const nextIteration = getNextIteration(
+      scaleAndShift({ x: pixel.canvasX, y: pixel.canvasY }),
+      { x: pixel.x, y: pixel.y }
+    )
 
-        const nextIteration = getNextIteration(
-          scaleAndShift({x: i, y: j}),
-          { x: x[i][j], y: y[i][j] }
-        );
-
-        x[i][j] = nextIteration.x;
-        y[i][j] = nextIteration.y;
-
-        const lengthSquared = x[i][j] ** 2 + y[i][j] ** 2;
-        
-        if(lengthSquared <= 4) {
-          if(update[i][j] !== 1) {
-            update[i][j] += 1;
-          }
-        } else if(update[i][j] === 1) {
-          update[i][j] += 1;
-        } else {
-          update[i][j] = 0;
-        }
-        
-        if(update[i][j] > 1) {
-          c.fillStyle = "hsl(" + (iteration + 250) + ", 100%, 50%)";
-          c.fillRect(i, j, 1, 1);
-        }
-      }
+    if(lengthSquared(nextIteration) <= 4) {
+      pixel.x = nextIteration.x;
+      pixel.y = nextIteration.y;
+    } else {
+      c.fillStyle = "hsl(" + (iteration + 250) + ", 100%, 50%)";
+      c.fillRect(pixel.canvasX, pixel.canvasY, 1, 1);
+      pixel.removed = true;
     }
   }
   
+  pixels = pixels.filter(pixel => !pixel.removed);
   iteration++;
 }, 100);
 
@@ -81,4 +55,8 @@ function getNextIteration(position, value) {
   x += position.x;
   y += position.y;
   return { x, y };
+}
+
+function lengthSquared(vector) {
+  return vector.x**2 + vector.y**2;
 }

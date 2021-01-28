@@ -6,6 +6,8 @@ let iteration = 1;
 const x = [];
 const y = [];
 
+const pixels = [];
+
 const update = [];
 
 c.fillStyle = "#000000";
@@ -15,10 +17,18 @@ for (let i = 0; i <= canvas.width; i++) {
   x[i] = [];
   y[i] = [];
   update[i] = [];
-  for(let j = 0; j <= canvas.height; j++){
-    x[i][j] = (i - canvas.width / 2 - 100) / (canvas.height / 3);
-    y[i][j] = (j - canvas.height / 2) / (canvas.height / 3);
+  for(let j = 0; j <= canvas.height; j++) {
+    const coordinates = scaleAndShift({x: i, y: j});
+    x[i][j] = coordinates.x;
+    y[i][j] = coordinates.y;
     update[i][j] = 1;
+
+    pixels.push({
+      x: coordinates.x,
+      y: coordinates.y,
+      canvasX: i,
+      canvasY: j
+    })
   }
 }
 
@@ -26,16 +36,15 @@ setInterval(function() {
   for (let i = 0; i <= canvas.width; i++) {
     for(let j = 0; j <= canvas.height; j++) {
       if(update[i][j] !== 0) {
-      
-        const x2 = x[i][j];
-        const y2 = y[i][j];
-        
-        x[i][j] = x2 ** 2 - y2 ** 2;
-        y[i][j] = 2 * x2 * y2;
-        
-        x[i][j] += (i - canvas.width / 2 - 100) / (canvas.height / 3);
-        y[i][j] += (j - canvas.height / 2) / (canvas.height / 3);
-        
+
+        const nextIteration = getNextIteration(
+          scaleAndShift({x: i, y: j}),
+          { x: x[i][j], y: y[i][j] }
+        );
+
+        x[i][j] = nextIteration.x;
+        y[i][j] = nextIteration.y;
+
         const lengthSquared = x[i][j] ** 2 + y[i][j] ** 2;
         
         if(lengthSquared <= 4) {
@@ -48,7 +57,7 @@ setInterval(function() {
           update[i][j] = 0;
         }
         
-        if(update[i][j] > 1){
+        if(update[i][j] > 1) {
           c.fillStyle = "hsl(" + (iteration + 250) + ", 100%, 50%)";
           c.fillRect(i, j, 1, 1);
         }
@@ -58,3 +67,18 @@ setInterval(function() {
   
   iteration++;
 }, 100);
+
+function scaleAndShift(vector) {
+  const x = (vector.x - canvas.width / 2 - 100) / (canvas.height / 3);
+  const y = (vector.y - canvas.height / 2) / (canvas.height / 3);
+  return { x, y };
+}
+
+function getNextIteration(position, value) {
+  let x = value.x ** 2 - value.y ** 2;
+  let y = 2 * value.x * value.y;
+  
+  x += position.x;
+  y += position.y;
+  return { x, y };
+}
